@@ -1,5 +1,7 @@
 import './App.css';
 import { Form } from './Form';
+import { isEqualValidator } from './multiValidators';
+import { dateValidator, emailValidator, isNotEmptyValidator, loverCaseValidator, minimumLengthValidator, minimumValueValidator, oneDigitValidator, symbolValidator, timeValidator, upperCaseValidator } from './validators';
 
 const displayData = ({ name }) => {
   alert('You Submitted' + name)
@@ -7,35 +9,64 @@ const displayData = ({ name }) => {
 
 function App() {
 
-  const isNotEmpty = (value) => {
-    return value.length === 0;;
-  }
-
-  const isNotTooShort = value => value.length < 2;
 
   return (
     <>
       <Form
+        validators={[isNotEmptyValidator]}
+        validateOn="submit"
+        multiValidators={[isEqualValidator('password', 'confirmPassword')]}
         fields={{
           'name': {
             type: "text",
             placeholder: 'JohnDoe',
             labelText: 'Your name',
-            validationFunctions: [isNotEmpty, isNotTooShort]
+            validators: [
+              minimumLengthValidator(2),
+            ]
           },
           'age': {
             type: "number",
-
-          },
-          'bio': {
-            validationFunctions: [isNotEmpty, isNotTooShort],
-            type: "text",
-
+            validators: [
+              minimumValueValidator(18)
+            ],
           },
           'birthday': {
             type: "text",
-
+            validators: [
+              dateValidator
+            ]
           },
+          'email': {
+            type: "text",
+            validators: [
+              emailValidator
+            ]
+          },
+          'birthHour': {
+            labelText: "Birth Hour",
+            validators: [
+              timeValidator
+            ],
+            type: "text"
+          },
+          'password': {
+            type: 'password',
+            placeholder: 'Enter your password',
+            validators: [
+              minimumLengthValidator(8),
+              loverCaseValidator,
+              upperCaseValidator,
+              oneDigitValidator,
+              symbolValidator
+            ]
+          },
+          'confirmPassword': {
+            type: 'password',
+            placeholder: 'confirm password',
+            validators: [
+            ]
+          }
         }}
         onSubmit={displayData}
       />
