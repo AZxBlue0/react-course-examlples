@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CheckboxGroup } from "./formComponents/CheckboxGroup";
+import { Dropdown } from "./formComponents/Dropdown";
+import { NumberInput } from "./formComponents/NumberInput";
+import { PasswordInput } from "./formComponents/PasswordInput";
+import { RadioGroup } from "./formComponents/RadioGroup";
+import { TextInput } from "./formComponents/TextInput";
 
 const getValidationErrors = (fieldValues, fieldsObject, globalValidators, editedFields = {}, isSubmit) => {
     let errors = {};
-    console.log(isSubmit);
     for (const [fieldName, fieldConfig] of Object.entries(fieldsObject)) {
-        console.log(editedFields);
         if (isSubmit || editedFields[fieldName]) {
             const allValidators = [...globalValidators, ...(fieldConfig.validators || [])];
             if (!fieldConfig.validators) continue;
@@ -19,10 +23,25 @@ const getValidationErrors = (fieldValues, fieldsObject, globalValidators, edited
     return errors;
 }
 
+const getComponentForFieldType = (type) => {
+    const typesMap = {
+        password: PasswordInput,
+        number: NumberInput,
+        text: TextInput,
+        radio: RadioGroup,
+        checkbox: CheckboxGroup,
+        dropdown: Dropdown
+    }
+    return typesMap[type]
+}
+
 const getDefaultValue = value => {
     const typeMap = {
         text: '',
         number: 0,
+        radio: '',
+        checkbox: [],
+        dropdown: '',
         password: '',
     }
     return typeMap[value]
@@ -34,11 +53,9 @@ const getMultiFieldValidationErrors = (fieldValues, validators, editedFields = {
         const involvedEditedFields = involvedFields.every(field => editedFields[field]);
 
         if ((isSubmit || involvedEditedFields) && !checkFunction(fieldValues)) {
-            console.log(checkFunction(fieldValues));
             errors.push(errorMessage);
         }
     }
-    console.log(errors);
 
     return errors;
 }
@@ -65,42 +82,43 @@ export const Form = ({ fields, onSubmit, validators = [], multiValidators = [], 
     const [editedFields, setEditedFields] = useState({});
     const [formHasBeenSubmitted, setFormHasBeenSubmitted] = useState(false);
 
-    const updateValidationErrors = fieldName => {
+    const fieldBlurred = fieldName => {
         const newEditedFields = { ...editedFields, [fieldName]: validateOn === 'change' };
-        const errors = getValidationErrors(fieldValues, fields, validators, newEditedFields, formHasBeenSubmitted);
-        const multiErrors = getMultiFieldValidationErrors(fieldValues, multiValidators, newEditedFields, formHasBeenSubmitted);
-        setValidationErrors(errors);
-        setMultiValidationErrors(multiErrors);
         setEditedFields(newEditedFields);
     }
 
+    useEffect(() => {
+        const errors = getValidationErrors(fieldValues, fields, validators, editedFields, formHasBeenSubmitted);
+        const multiErrors = getMultiFieldValidationErrors(fieldValues, multiValidators, editedFields, formHasBeenSubmitted);
+        setValidationErrors(errors);
+        setMultiValidationErrors(multiErrors);
+    }, [fieldValues, editedFields, fields, validators, multiValidators, formHasBeenSubmitted])
+
     return (
         <>
-            <div>{multiValidationErrors.map(error => <p>{error}</p>)}</div>
             <form onSubmit={e => e.preventDefault()}>
-                {Object.entries(fieldValues).map(([fieldName, fieldValue]) => {
-                    const fieldConfig = fields[fieldName];
-
-                    const { labelText, type, placeholder } = fieldConfig;
-                    const error = validationErrors[fieldName]
-                    return (
-                        <label key={`l ${fieldName}`} >
-                            {labelText ? labelText : capitalise(fieldName)}
-                            < input
+                {
+                    Object.entries(fieldValues).map(([fieldName, fieldValue]) => {
+                        const fieldConfig = fields[fieldName];
+                        const { labelText, type, placeholder, options } = fieldConfig;
+                        const InputComponent = getComponentForFieldType(type);
+                        const error = validationErrors[fieldName];
+                        return (
+                            <InputComponent
                                 key={fieldName}
-                                type={type}
+                                fieldName={fieldName}
+                                label={labelText || capitalise(fieldName)}
+                                hint={placeholder}
                                 value={fieldValue}
-                                placeholder={placeholder}
-                                onChange={e => setFieldValues({ ...fieldValues, [fieldName]: e.target.value })}
-                                onBlur={() => {
-                                    updateValidationErrors(fieldName);
-                                }}
-                            />
-                            {error && <p>{error}</p>}
-                        </label>
-                    )
-                })}
-
+                                options={options}
+                                onChange={newValue => setFieldValues({
+                                    ...fieldValues, [fieldName]: newValue
+                                })}
+                                error={error}
+                                onBlur={() => fieldBlurred(fieldName)}
+                            />)
+                    })
+                }
                 <button onClick={() => {
                     if (Object.keys(validationErrors).length === 0 && multiValidationErrors.length === 0) {
                         const errors = getValidationErrors(fieldValues, fields, validators, {}, true);
@@ -115,6 +133,7 @@ export const Form = ({ fields, onSubmit, validators = [], multiValidators = [], 
                     }
                 }}>Submit</button>
             </form >
+            <div className="multi-error-container form-component-error">{multiValidationErrors.map(error => <p>{error}</p>)}</div>
         </>
     );
 }
