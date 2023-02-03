@@ -1,12 +1,20 @@
 import { useRecoilState } from "recoil"
-import { blueClickState } from "./recoil/atoms"
+import { colorControlStateFamily } from "./recoil/atoms"
+import Slider from "rc-slider";
 
 export const BlueButton = () => {
-    const [clicks, setClicks] = useRecoilState(blueClickState);
+    const [colorValue, setColorValue] = useRecoilState(colorControlStateFamily('blue'));
+
     return (
         <div>
-            <button onClick={() => { setClicks(clicks + 1) }}>Blue</button>
-            <p>{clicks}</p>
+            <Slider
+                trackStyle={{backgroundColor: 'blue'}}
+                min={0}
+                max={255}
+                value={colorValue}
+                onChange={value=>setColorValue(value)}
+            />
+            <p>{colorValue}</p>
         </div>
     )
 }

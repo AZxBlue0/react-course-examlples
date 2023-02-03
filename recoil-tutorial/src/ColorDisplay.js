@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRecoilState } from "recoil";
-import { displayColorHexState, displayColorState } from "./recoil/selectors";
+import { displayColorHexState } from "./recoil/selectors";
 
 export const ColorDisplay = () => {
     const [displayColor, setDisplayColor] = useRecoilState(displayColorHexState);
@@ -8,16 +8,12 @@ export const ColorDisplay = () => {
 
     return (
         <>
-            <div style={{
+            <div className='display' style={{
                 backgroundColor: displayColor,
-                height: '400px',
-                width: '400px',
+                height: '200px',
+                width: '100%',
+                marginTop: '1em'
             }} ></div>
-            <input
-                value={hexInput}
-                onChange={e => setHexInput(e.target.value)}
-            />
-            <button onClick={() => {setDisplayColor(hexInput); setHexInput('')}}>Set RGB</button>
         </>
     )
 }

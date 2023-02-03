@@ -1,11 +1,11 @@
 import { useRecoilState } from "recoil"
-import { blueClickState, greenClickState, redClickState } from "./recoil/atoms";
+import { colorControlStateFamily } from "./recoil/atoms";
 
 export const ResetButton = () => {
 
-    const [, setRedClicks]= useRecoilState(redClickState);
-    const [, setBlueClicks]= useRecoilState(blueClickState);
-    const [, setGreenClicks]= useRecoilState(greenClickState);
+    const [, setRedClicks] = useRecoilState(colorControlStateFamily('red'));
+    const [, setBlueClicks] = useRecoilState(colorControlStateFamily('red'));
+    const [, setGreenClicks] = useRecoilState(colorControlStateFamily('red'));
 
     const resetClicks = () => {
         setRedClicks(0);

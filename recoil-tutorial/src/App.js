@@ -1,20 +1,18 @@
 import './App.css';
-import { RedButton } from './RedButton';
-import { GreenButton } from './GreenButton';
-import { BlueButton } from './BlueButton';
+import 'rc-slider/assets/index.css';
 import { ResetButton } from './ResetButton';
 import { ColorDisplay } from './ColorDisplay';
 import { RecoilRoot } from 'recoil';
+import { ColorControlPanel } from './ColorControlPanel';
+import { ColorControl } from './ColorControl';
 
 function App() {
   return (
     <RecoilRoot>
-      <div className="App">
-        <RedButton />
-        <GreenButton />
-        <BlueButton />
-        <ResetButton />
+      <div className='mainContainer'>
         <ColorDisplay />
+        <ColorControlPanel />
+        <ResetButton />
       </div>
     </RecoilRoot>
   );

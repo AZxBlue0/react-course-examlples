@@ -1,13 +1,13 @@
 import { selector } from "recoil";
-import { blueClickState, greenClickState, redClickState } from "./atoms";
+import { colorControlStateFamily, colorsState } from "./atoms";
 import { hexToRgb, rgbToHex } from "./util";
 
 export const displayColorState = selector({
     key: 'displayColorState',
     get: ({ get }) => {
-        const red = get(redClickState);
-        const green = get(greenClickState);
-        const blue = get(blueClickState);
+        const red = get(colorControlStateFamily('red'));
+        const green = get(colorControlStateFamily('green'));
+        const blue = get(colorControlStateFamily('blue'));
 
         return `rgb(${red},${green},${blue})`;
     }
@@ -16,15 +16,32 @@ export const displayColorState = selector({
 export const displayColorHexState = selector({
     key: 'displayColorHexState',
     get: ({ get }) => {
-        const red = get(redClickState);
-        const green = get(greenClickState);
-        const blue = get(blueClickState);
-        return rgbToHex(Math.min(red, 255), Math.min(green, 255), Math.min(blue, 255));
-    },
-    set: ({ set }, hexValue) => {
-        const { r, g, b } = hexToRgb(hexValue);
-        set(redClickState, r);
-        set(greenClickState, g);
-        set(blueClickState, b);
+        const colors = get(colorsState);
+
+        if (colors.length === 0) {
+            return '#000000';
+        }
+
+        const totalStrengthValue = colors
+            .map(color => get(colorControlStateFamily(color)))
+            .reduce((sum, x) => sum + x);
+
+        const rgbTotals = colors
+            .map(color => {
+                return { ...hexToRgb(color), relativeStrength: get(colorControlStateFamily(color))/10 }
+            })
+            .reduce((total, { r, g, b, relativeStrength }) => ({
+                r: total.r + r * relativeStrength,
+                g: total.g + g * relativeStrength,
+                b: total.b + b * relativeStrength,
+            }), { r: 0, g: 0, b: 0 });
+
+        const averageColor = {
+            r: Math.floor(rgbTotals.r),
+            g: Math.floor(rgbTotals.g),
+            b: Math.floor(rgbTotals.b),
+        }
+
+        return rgbToHex(averageColor.r, averageColor.g, averageColor.b);
     }
 })

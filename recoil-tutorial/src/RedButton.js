@@ -1,12 +1,20 @@
 import { useRecoilState } from "recoil"
-import { redClickState } from "./recoil/atoms"
+import { colorControlStateFamily } from "./recoil/atoms"
+import Slider from "rc-slider";
 
-export const RedButton = () => {
-    const [clicks, setClicks] = useRecoilState(redClickState);
+export const RedControl = () => {
+    const [colorValue, setColorValue] = useRecoilState(colorControlStateFamily('red'));
+
     return (
         <div>
-            <button onClick={() => {setClicks(clicks+1)}}>Red</button>
-            <p>{clicks}</p>
+            <Slider
+                trackStyle={{ backgroundColor: 'red' }}
+                min={0}
+                max={255}
+                value={colorValue}
+                onChange={value => setColorValue(value)}
+            />
+            <p>{colorValue}</p>
         </div>
     )
 }

@@ -1,22 +1,15 @@
-import { atom } from "recoil";
+import { atom, atomFamily } from "recoil";
 
-export const redClickState = atom(
+export const colorControlStateFamily = atomFamily(
     {
-        key: 'redClickState',
+        key: 'colorControlStateFamily',
         default: 0
     }
-);
+)
 
-export const greenClickState = atom(
+export const colorsState = atom(
     {
-        key: 'greenClickState',
-        default: 0
+        key: 'colorState',
+        default: []
     }
-);
-
-export const blueClickState = atom(
-    {
-        key: 'blueClickState',
-        default: 0
-    }
-);
+)
