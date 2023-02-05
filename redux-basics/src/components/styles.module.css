@@ -1,0 +1,38 @@
+.redButton {
+    background-color: red;
+}
+
+.blueButton {
+    background-color: blue;
+}
+
+.greenButton {
+    background-color: green;
+}
+
+.resetButton {
+    background-color: aquamarine;
+}
+
+button {
+    padding: 1em;
+    color: white;
+    text-shadow: black;
+    font-size: 2em;
+    border: 0px;
+    border-radius: 1em;
+    min-width: 20em;
+    cursor: pointer;
+}
+
+.redText {
+    color: red;
+}
+
+.blueText {
+    color: blue;
+}
+
+.greenText {
+    color: green
+}
